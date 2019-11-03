@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -123,6 +124,16 @@ namespace okta_aspnet_mvc_example.Controllers
                 }
 
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",  token);
+
+                var soapString = @"<Envelope xmlns=""http://schemas.xmlsoap.org/soap/envelope/""><Body><HelloWorld xmlns = ""http://tempuri.org/"" /></Body></Envelope>";
+                client.DefaultRequestHeaders.Add("SOAPAction", "http://tempuri.org/HelloWorld");
+                var content = new StringContent(soapString, Encoding.UTF8, "text/xml");
+                using (var response = await client.PostAsync("https://localhost:44388/WebService1.asmx", content))
+                {
+                    var soapResponse = await response.Content.ReadAsStringAsync();
+                    //return this.ParseSoapResponse(soapResponse);
+                }
+
                 //Sending request to find web api REST service resource GetAllEmployees using HttpClient  
                 var Res = await client.GetAsync("api/listitems/1");
 
